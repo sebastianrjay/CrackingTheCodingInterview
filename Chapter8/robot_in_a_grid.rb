@@ -36,14 +36,11 @@ def next_coords(matrix, current_coords, visited_coords)
   end
 end
 
-def get_valid_path(matrix)
-  return nil if matrix.length < 1 || matrix[0].length < 1
-  if matrix.length == 1 && matrix[0].length == 1
-    return [[0, 0]] unless get_cell(matrix, [0, 0]).off_limits
-    return nil
-  end
+def get_valid_path_iteratively(matrix)
+  return nil if !matrix || matrix.length == 0 || matrix[0].length == 0
   current_path_array, current_path_set, visited_coords = [], Set.new, Set.new
   current_coords, final_coords = [0, 0], [matrix.length - 1, matrix[0].length - 1]
+  return nil if get_cell(matrix, current_coords).off_limits
   current_path_array << current_coords
   current_path_set << current_coords
 
@@ -68,8 +65,40 @@ def get_valid_path(matrix)
   current_path_array.empty? ? nil : current_path_array
 end
 
+def get_valid_path_recursively(matrix)
+  return nil if matrix.nil? || matrix.length == 0 || matrix[0].length == 0
+
+  path, cache = [], {}
+  last_row, last_col = matrix.length - 1, matrix[0].length - 1
+
+  if get_recursive_path(matrix, last_row, last_col, path, cache)
+    return path
+  end
+
+  nil
+end
+
+def get_recursive_path(matrix, row, col, path, cache)
+  if col < 0 || row < 0 || matrix[row][col].off_limits
+    return false
+  end
+
+  return cache[[row, col]] if cache[[row, col]]
+
+  is_at_origin, success = (row == 0 && col == 0), false
+  if is_at_origin || get_recursive_path(matrix, row, col - 1, path, cache) ||
+      get_recursive_path(matrix, row - 1, col, path, cache)
+    path << [row, col]
+    success = true
+  end
+
+  cache[[row, col]] = success
+  success
+end
+
 puts "matrix:"
 puts "["
 matrix.each {|row| p row.map(&:off_limits) }
 puts "]"
-p get_valid_path(matrix)
+p get_valid_path_iteratively(matrix)
+p get_valid_path_recursively(matrix)
