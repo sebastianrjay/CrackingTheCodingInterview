@@ -26,11 +26,14 @@ def in_bounds?(matrix, coords)
     coords[1] >= 0 && coords[1] < matrix[0].length
 end
 
-def next_coord_pairs(matrix, current_coords)
+def next_coords(matrix, current_coords, visited_coords)
   downward_coords = [current_coords[0] + 1, current_coords[1]]
   rightward_coords = [current_coords[0], current_coords[1] + 1]
 
-  [downward_coords, rightward_coords].select {|coords| in_bounds?(matrix, coords)}
+  [downward_coords, rightward_coords].find do |coords|
+    in_bounds?(matrix, coords) && !get_cell(matrix, coords).off_limits &&
+      !visited_coords.include?(coords)
+  end
 end
 
 def get_valid_path(matrix)
@@ -39,31 +42,23 @@ def get_valid_path(matrix)
     return [[0, 0]] unless get_cell(matrix, [0, 0]).off_limits
     return nil
   end
-  current_path_array, off_limits_coords, visited_coords = [], Set.new, Set.new
+  current_path_array, current_path_set, visited_coords = [], Set.new, Set.new
   current_coords, final_coords = [0, 0], [matrix.length - 1, matrix[0].length - 1]
-  current_path_set = Set.new
   current_path_array << current_coords
   current_path_set << current_coords
 
   until current_coords == final_coords || current_path_array.empty?
-    next_coords = next_coord_pairs(matrix, current_coords)
-    next_coords.each do |coords|
-      off_limits_coords << coords if get_cell(matrix, coords).off_limits
-    end
+    next_coords = next_coords(matrix, current_coords, visited_coords)
 
-    new_coords = next_coords.find do |coords|
-      !off_limits_coords.include?(coords) && !visited_coords.include?(coords)
-    end
-
-    if new_coords
-      [current_coords, new_coords].each do |coords|
+    if next_coords
+      [current_coords, next_coords].each do |coords|
         unless current_path_set.include?(coords)
           current_path_set << coords
           visited_coords << coords
           current_path_array << coords
         end
       end
-      current_coords = new_coords
+      current_coords = next_coords
     else
       current_coords = current_path_array.pop
       current_path_set.delete(current_coords)
