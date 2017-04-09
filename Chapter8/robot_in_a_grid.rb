@@ -36,6 +36,7 @@ def next_coords(matrix, current_coords, visited_coords)
   end
 end
 
+# Worst case O(m * n) time and O(m * n) space
 def get_valid_path_iteratively(matrix)
   return nil if !matrix || matrix.length == 0 || matrix[0].length == 0
   current_path_array, current_path_set, visited_coords = [], Set.new, Set.new
@@ -65,19 +66,6 @@ def get_valid_path_iteratively(matrix)
   current_path_array.empty? ? nil : current_path_array
 end
 
-def get_valid_path_recursively(matrix)
-  return nil if matrix.nil? || matrix.length == 0 || matrix[0].length == 0
-
-  path, cache = [], {}
-  last_row, last_col = matrix.length - 1, matrix[0].length - 1
-
-  if get_recursive_path(matrix, last_row, last_col, path, cache)
-    return path
-  end
-
-  nil
-end
-
 def get_recursive_path(matrix, row, col, path, cache)
   if col < 0 || row < 0 || matrix[row][col].off_limits
     return false
@@ -94,6 +82,20 @@ def get_recursive_path(matrix, row, col, path, cache)
 
   cache[[row, col]] = success
   success
+end
+
+# Worst case O(m * n) time and O((m + n) choose n) space
+def get_valid_path_recursively(matrix)
+  return nil if matrix.nil? || matrix.length == 0 || matrix[0].length == 0
+
+  path, cache = [], {}
+  last_row, last_col = matrix.length - 1, matrix[0].length - 1
+
+  if get_recursive_path(matrix, last_row, last_col, path, cache)
+    return path
+  end
+
+  nil
 end
 
 puts "matrix:"
