@@ -36,7 +36,7 @@ def next_coords(matrix, current_coords, visited_coords)
   end
 end
 
-# Worst case O(m * n) time and O(m * n) space
+# Worst case O(h * w) time and O(h * w) space.
 def get_valid_path_iteratively(matrix)
   return nil if !matrix || matrix.length == 0 || matrix[0].length == 0
   current_path_array, current_path_set, visited_coords = [], Set.new, Set.new
@@ -84,7 +84,9 @@ def get_recursive_path(matrix, row, col, path, cache)
   success
 end
 
-# Worst case O(m * n) time and O((m + n) choose n) space
+# Worst case O(h * w) time and O((h + w)((h + w) choose w)) space.
+# There are (h + w) choose w paths through the matrix, where each path consists 
+# only of rightward and downward steps. Each path consists of h + w steps.
 def get_valid_path_recursively(matrix)
   return nil if matrix.nil? || matrix.length == 0 || matrix[0].length == 0
 
